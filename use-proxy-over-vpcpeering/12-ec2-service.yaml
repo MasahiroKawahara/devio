@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 instance (service)
+Parameters:
+  Prefix:
+    Description: Enter a prefix of this system.
+    Type: String
+    Default: devio-proxy
+  Ec2ImageId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  Ec2InstanceType:
+    Type: String
+    Default: t3.nano
+  Ec2KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable access to instances.
+ 
+Resources:
+  ServiceInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref Ec2ImageId
+      InstanceType: !Ref Ec2InstanceType
+      KeyName: !Ref Ec2KeyName  
+      SubnetId:
+        Fn::ImportValue: !Sub ${Prefix}-subnet3
+      SecurityGroupIds:
+        - Fn::ImportValue: !Sub ${Prefix}-service-sg
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install httpd -y
+          
+          sudo systemctl start httpd
+          sudo systemctl enable httpd
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-ec2-service
+
+Outputs:
+  ServiceInstance:
+    Value: !Ref ServiceInstance
+    Export:
+      Name: !Sub ${Prefix}-ec2-service
+  PublicIp:
+    Description: ServiceServer Public IP
+    Value: !GetAtt ServiceInstance.PublicIp
+  PrivateIp:
+    Description: ServiceServer Private IP
+    Value: !GetAtt ServiceInstance.PrivateIp

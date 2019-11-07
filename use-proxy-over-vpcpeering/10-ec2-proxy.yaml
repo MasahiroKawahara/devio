@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 instance (proxy)
+Parameters:
+  Prefix:
+    Description: Enter a prefix of this system.
+    Type: String
+    Default: devio-proxy
+  Ec2ImageId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  Ec2InstanceType:
+    Type: String
+    Default: t3.nano
+  Ec2KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable access to instances.
+ 
+Resources:
+  ProxyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref Ec2ImageId
+      InstanceType: !Ref Ec2InstanceType
+      KeyName: !Ref Ec2KeyName  
+      SubnetId:
+        Fn::ImportValue: !Sub ${Prefix}-subnet2
+      SecurityGroupIds:
+        - Fn::ImportValue: !Sub ${Prefix}-proxy-sg
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install squid -y
+          
+          sudo systemctl start squid
+          sudo systemctl enable squid
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-ec2-proxy
+
+Outputs:
+  ProxyInstance:
+    Value: !Ref ProxyInstance
+    Export:
+      Name: !Sub ${Prefix}-ec2-proxy
+  PublicIp:
+    Description: ProxyServer Public IP
+    Value: !GetAtt ProxyInstance.PublicIp
+  PrivateIp:
+    Description: ProxyServer Private IP
+    Value: !GetAtt ProxyInstance.PrivateIp
