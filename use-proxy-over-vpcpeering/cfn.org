@@ -1,0 +1,742 @@
+[[https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks?filteringText=&filteringStatus=active&viewNested=true&hideStacks=false][aws: management console > cfn]]
+* CFn: Top
+  - prefix :: devio-proxy
+** Parameters
+   #+NAME:param-prefix
+   #+BEGIN_SRC yaml
+Description: Enter a prefix of this system.
+Type: String
+Default: devio-proxy
+   #+END_SRC
+* CFn: Network
+  file:./00-network.yaml
+  - vpc1, subnet1 :: 192.168.0.0/24, /27
+  - vpc2, subnet2 :: 10.0.0.0/24, /27
+  - vpc3, subnet3 :: 10.0.200.0/24, /27
+  - igw[1|2|3] :: 
+  - vpcpeering :: vpc1 <--> vpc2
+  - vpcpeering-dx :: vpc2 <--> vpc3
+  - route-table-[1|2|3] :: 
+  #+BEGIN_SRC yaml :noweb yes :tangle 00-network.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC Network
+Parameters:
+  Prefix:
+    <<param-prefix>>
+
+Resources:
+  # VPC
+  VPC1:
+    <<vpc(name="!Sub ${Prefix}-vpc1", cidr="192.168.0.0/24")>>
+  VPC2:
+    <<vpc(name="!Sub ${Prefix}-vpc2", cidr="10.0.0.0/24")>>
+  VPC3:
+    <<vpc(name="!Sub ${Prefix}-vpc3", cidr="10.0.200.0/24")>>
+
+  # IGW
+  IGW1:
+    <<igw(name="!Sub ${Prefix}-igw1")>>
+  IGW1Attach:
+    <<igw-attach(igwid="!Ref IGW1", vpcid="!Ref VPC1")>>
+  IGW2:
+    <<igw(name="!Sub ${Prefix}-igw2")>>
+  IGW2Attach:
+    <<igw-attach(igwid="!Ref IGW2", vpcid="!Ref VPC2")>>
+  IGW3:
+    <<igw(name="!Sub ${Prefix}-igw3")>>
+  IGW3Attach:
+    <<igw-attach(igwid="!Ref IGW3", vpcid="!Ref VPC3")>>
+
+  # VPCPeering
+  VPCPeering:
+    <<vpcpeering>>
+  VPCPeeringDx:
+    <<vpcpeering-dx>>
+
+  # Subnet
+  Subnet1:
+    <<subnet(vpcid="!Ref VPC1", az="ap-northeast-1a", cidr="192.168.0.0/27", name="!Sub ${Prefix}-subnet1")>>
+  Subnet2:
+    <<subnet(vpcid="!Ref VPC2", az="ap-northeast-1a", cidr="10.0.0.0/27",   name="!Sub ${Prefix}-subnet2")>>
+  Subnet3:
+    <<subnet(vpcid="!Ref VPC3", az="ap-northeast-1a", cidr="10.0.200.0/27",   name="!Sub ${Prefix}-subnet3")>>
+
+  # Routing
+  <<routing1>>
+  <<routing2>>
+  <<routing3>>
+
+Outputs:
+  <<outputs-network>>
+  #+END_SRC
+
+** Resources
+*** routing1
+    #+NAME:routing1
+    #+BEGIN_SRC yaml
+RouteTable1:
+  Type: AWS::EC2::RouteTable
+  Properties:
+    VpcId: !Ref VPC1
+    Tags:
+      - Key: Name
+        Value: !Sub ${Prefix}-route-table-1
+RouteTable1Association:
+  Type: AWS::EC2::SubnetRouteTableAssociation
+  Properties:
+    RouteTableId: !Ref RouteTable1
+    SubnetId: !Ref Subnet1
+Route1a:
+  Type: AWS::EC2::Route
+  Properties:
+    RouteTableId: !Ref RouteTable1
+    DestinationCidrBlock: 0.0.0.0/0
+    GatewayId: !Ref IGW1
+Route1b:
+  Type: AWS::EC2::Route
+  Properties:
+    RouteTableId: !Ref RouteTable1
+    DestinationCidrBlock: 10.0.0.0/24
+    VpcPeeringConnectionId: !Ref VPCPeering
+    #+END_SRC
+*** routing2
+    #+NAME:routing2
+    #+BEGIN_SRC yaml
+RouteTable2:
+  Type: AWS::EC2::RouteTable
+  Properties:
+    VpcId: !Ref VPC2
+    Tags:
+      - Key: Name
+        Value: !Sub ${Prefix}-route-table-2
+RouteTable2Association:
+  Type: AWS::EC2::SubnetRouteTableAssociation
+  Properties:
+    RouteTableId: !Ref RouteTable2
+    SubnetId: !Ref Subnet2
+Route2a:
+  Type: AWS::EC2::Route
+  Properties:
+    RouteTableId: !Ref RouteTable2
+    DestinationCidrBlock: 0.0.0.0/0
+    GatewayId: !Ref IGW2
+Route2b:
+  Type: AWS::EC2::Route
+  Properties:
+    RouteTableId: !Ref RouteTable2
+    DestinationCidrBlock: 192.168.0.0/24
+    VpcPeeringConnectionId: !Ref VPCPeering
+Route2c:
+  Type: AWS::EC2::Route
+  Properties:
+    RouteTableId: !Ref RouteTable2
+    DestinationCidrBlock: 10.0.200.0/24
+    VpcPeeringConnectionId: !Ref VPCPeeringDx
+    #+END_SRC
+*** routing3
+    #+NAME:routing3
+    #+BEGIN_SRC yaml
+RouteTable3:
+  Type: AWS::EC2::RouteTable
+  Properties:
+    VpcId: !Ref VPC3
+    Tags:
+      - Key: Name
+        Value: !Sub ${Prefix}-route-table-3
+RouteTable3Association:
+  Type: AWS::EC2::SubnetRouteTableAssociation
+  Properties:
+    RouteTableId: !Ref RouteTable3
+    SubnetId: !Ref Subnet3
+Route3a:
+  Type: AWS::EC2::Route
+  Properties:
+    RouteTableId: !Ref RouteTable3
+    DestinationCidrBlock: 0.0.0.0/0
+    GatewayId: !Ref IGW3
+Route3b:
+  Type: AWS::EC2::Route
+  Properties:
+    RouteTableId: !Ref RouteTable3
+    DestinationCidrBlock: 10.0.0.0/24
+    VpcPeeringConnectionId: !Ref VPCPeeringDx
+    #+END_SRC
+
+*** vpcpeering
+    #+NAME:vpcpeering
+    #+BEGIN_SRC yaml
+Type: AWS::EC2::VPCPeeringConnection
+Properties: 
+  VpcId: !Ref VPC1
+  PeerVpcId: !Ref VPC2
+  Tags:
+    - Key: Name
+      Value: !Sub ${Prefix}-vpcpeering
+    #+END_SRC
+*** vpcpeering-dx
+    #+NAME:vpcpeering-dx
+    #+BEGIN_SRC yaml
+Type: AWS::EC2::VPCPeeringConnection
+Properties: 
+  VpcId: !Ref VPC2
+  PeerVpcId: !Ref VPC3
+  Tags:
+    - Key: Name
+      Value: !Sub ${Prefix}-vpcpeering-dx
+    #+END_SRC
+** Outputs
+   #+NAME:outputs-network
+   #+BEGIN_SRC yaml
+VPC1:
+  Value: !Ref VPC1
+  Export:
+    Name: !Sub ${Prefix}-vpc1
+VPC2:
+  Value: !Ref VPC2
+  Export:
+    Name: !Sub ${Prefix}-vpc2
+VPC3:
+  Value: !Ref VPC3
+  Export:
+    Name: !Sub ${Prefix}-vpc3
+IGW1:
+  Value: !Ref IGW1
+  Export:
+    Name: !Sub ${Prefix}-igw1
+IGW2:
+  Value: !Ref IGW2
+  Export:
+    Name: !Sub ${Prefix}-igw2
+IGW3:
+  Value: !Ref IGW3
+  Export:
+    Name: !Sub ${Prefix}-igw3
+VPCPeering:
+  Value: !Ref VPCPeering
+  Export:
+    Name: !Sub ${Prefix}-vpcpeering
+VPCPeeringDX:
+  Value: !Ref VPCPeeringDx
+  Export:
+    Name: !Sub ${Prefix}-vpcpeering-dx
+Subnet1:
+  Value: !Ref Subnet1
+  Export:
+    Name: !Sub ${Prefix}-subnet1
+Subnet2:
+  Value: !Ref Subnet2
+  Export:
+    Name: !Sub ${Prefix}-subnet2
+Subnet3:
+  Value: !Ref Subnet3
+  Export:
+    Name: !Sub ${Prefix}-subnet3
+RouteTable1:
+  Value: !Ref RouteTable1
+  Export:
+    Name: !Sub ${Prefix}-route-table-1
+RouteTable2:
+  Value: !Ref RouteTable2
+  Export:
+    Name: !Sub ${Prefix}-route-table-2
+RouteTable3:
+  Value: !Ref RouteTable3
+  Export:
+    Name: !Sub ${Prefix}-route-table-3
+   #+END_SRC
+* CFn: SecurityGroup
+  file:./01-sg.yaml
+  - [app|proxy|service]-sg ::
+  #+BEGIN_SRC yaml :noweb yes :tangle 01-sg.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Security Groups
+Parameters:
+  Prefix:
+    <<param-prefix>>
+  GlobalIP:
+    <<param-globalip>>
+
+Resources:
+  AppSG:
+    <<sg-app>>
+  ProxySG:
+    <<sg-proxy>>
+  ServiceSG:
+    <<sg-service>>
+
+Outputs:
+  <<outputs-sg>>
+  #+END_SRC
+
+** Resources
+*** sg-app
+    #+NAME:sg-app
+    #+BEGIN_SRC yaml
+Type: AWS::EC2::SecurityGroup
+Properties: 
+  GroupDescription: SG for App Server
+  GroupName: !Sub ${Prefix}-app-sg
+  VpcId:
+    Fn::ImportValue: !Sub ${Prefix}-vpc1
+  SecurityGroupIngress:
+    - IpProtocol: tcp
+      FromPort: 3389
+      ToPort: 3389
+      CidrIp: !Sub ${GlobalIP}/32
+  Tags: 
+    - Key: Name
+      Value: !Sub ${Prefix}-app-sg
+    #+END_SRC
+*** sg-proxy
+    #+NAME:sg-proxy
+    #+BEGIN_SRC yaml
+Type: AWS::EC2::SecurityGroup
+Properties: 
+  GroupDescription: SG for Proxy Server
+  GroupName: !Sub ${Prefix}-proxy-sg
+  VpcId:
+    Fn::ImportValue: !Sub ${Prefix}-vpc2
+  SecurityGroupIngress:
+    - IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      CidrIp: !Sub ${GlobalIP}/32
+    - IpProtocol: tcp
+      FromPort: 3128
+      ToPort: 3128
+      SourceSecurityGroupId: !Ref AppSG
+  Tags: 
+    - Key: Name
+      Value: !Sub ${Prefix}-proxy-sg
+    #+END_SRC
+*** sg-service
+    #+NAME:sg-service
+    #+BEGIN_SRC yaml
+Type: AWS::EC2::SecurityGroup
+Properties: 
+  GroupDescription: SG for Service Server
+  GroupName: !Sub ${Prefix}-service-sg
+  VpcId:
+    Fn::ImportValue: !Sub ${Prefix}-vpc3
+  SecurityGroupIngress:
+    - IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      CidrIp: !Sub ${GlobalIP}/32
+    - IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId: !Ref ProxySG
+  Tags: 
+    - Key: Name
+      Value: !Sub ${Prefix}-service-sg
+    #+END_SRC
+** Parameters
+   #+NAME:param-globalip
+   #+BEGIN_SRC yaml
+Description: Enter a globalIP of your environment
+Type: String
+Default: 0.0.0.0
+   #+END_SRC
+** Outputs
+   #+NAME:outputs-sg
+   #+BEGIN_SRC yaml
+AppSG:
+  Value: !Ref AppSG
+  Export:
+    Name: !Sub ${Prefix}-app-sg
+ProxySG:
+  Value: !Ref ProxySG
+  Export:
+    Name: !Sub ${Prefix}-proxy-sg
+ServiceSG:
+  Value: !Ref ServiceSG
+  Export:
+    Name: !Sub ${Prefix}-service-sg
+   #+END_SRC
+* CFn: EC2 (Proxy)
+  file:./10-ec2-proxy.yaml
+  - ec2-proxy :: 
+  #+BEGIN_SRC yaml :noweb yes :tangle 10-ec2-proxy.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 instance (proxy)
+Parameters:
+  Prefix:
+    <<param-prefix>>
+  Ec2ImageId:
+    <<param-ec2imageid-proxy>>
+  Ec2InstanceType:
+    <<param-ec2instancetype-proxy>>
+  Ec2KeyName:
+    <<param-ec2keyname-proxy>>
+ 
+Resources:
+  ProxyInstance:
+    <<proxy-instance>>
+
+Outputs:
+  <<outputs-ec2-proxy>>
+  #+END_SRC
+
+** Parameters
+   #+NAME:param-ec2imageid-proxy
+   #+BEGIN_SRC yaml
+Type: AWS::SSM::Parameter::Value<String>
+Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+   #+END_SRC
+
+   #+NAME:param-ec2instancetype-proxy
+   #+BEGIN_SRC yaml    
+Type: String
+Default: t3.nano
+   #+END_SRC
+
+   #+NAME:param-ec2keyname-proxy
+   #+BEGIN_SRC yaml
+Type: AWS::EC2::KeyPair::KeyName
+Description: Name of an existing EC2 KeyPair to enable access to instances.
+   #+END_SRC
+** Resources
+*** ProxyInstance
+    #+NAME:proxy-instance
+    #+BEGIN_SRC yaml :noweb yes
+Type: AWS::EC2::Instance
+Properties:
+  ImageId: !Ref Ec2ImageId
+  InstanceType: !Ref Ec2InstanceType
+  KeyName: !Ref Ec2KeyName  
+  SubnetId:
+    Fn::ImportValue: !Sub ${Prefix}-subnet2
+  SecurityGroupIds:
+    - Fn::ImportValue: !Sub ${Prefix}-proxy-sg
+  UserData:
+    Fn::Base64: !Sub |
+      <<proxy-userdata>>
+  Tags:
+    - Key: Name
+      Value: !Sub ${Prefix}-ec2-proxy
+    #+END_SRC
+
+*** Userdata
+    #+NAME:proxy-userdata
+    #+BEGIN_SRC bash
+#!/bin/bash
+sudo yum update -y
+sudo yum install squid -y
+
+sudo systemctl start squid
+sudo systemctl enable squid
+    #+END_SRC
+
+** Outputs
+    #+NAME:outputs-ec2-proxy
+    #+BEGIN_SRC yaml
+ProxyInstance:
+  Value: !Ref ProxyInstance
+  Export:
+    Name: !Sub ${Prefix}-ec2-proxy
+PublicIp:
+  Description: ProxyServer Public IP
+  Value: !GetAtt ProxyInstance.PublicIp
+PrivateIp:
+  Description: ProxyServer Private IP
+  Value: !GetAtt ProxyInstance.PrivateIp
+    #+END_SRC
+* CFn: EC2 (App)
+  file:./11-ec2-app.yaml
+  - ec2-app ::
+  #+BEGIN_SRC yaml :noweb yes :tangle 11-ec2-app.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 instance (app)
+Parameters:
+  Prefix:
+    <<param-prefix>>
+  ProxyIp:
+    <<param-proxy-ip>>
+  Ec2ImageId:
+    <<param-ec2imageid-app>>
+  Ec2InstanceType:
+    <<param-ec2instancetype-app>>
+  Ec2KeyName:
+    <<param-ec2keyname-app>>
+ 
+Resources:
+  AppInstance:
+    <<app-instance>>
+
+Outputs:
+  <<outputs-ec2-app>>
+  #+END_SRC
+
+** Parameters
+   #+NAME:param-proxy-ip
+   #+BEGIN_SRC yaml
+Type: String
+Default: 10.0.0.10
+   #+END_SRC
+
+   #+NAME:param-ec2imageid-app
+   #+BEGIN_SRC yaml
+Type: AWS::SSM::Parameter::Value<String>
+Default: /aws/service/ami-windows-latest/Windows_Server-2019-Japanese-Full-Base
+   #+END_SRC
+
+   #+NAME:param-ec2instancetype-app
+   #+BEGIN_SRC yaml    
+Type: String
+Default: t3.nano
+   #+END_SRC
+
+   #+NAME:param-ec2keyname-app
+   #+BEGIN_SRC yaml
+Type: AWS::EC2::KeyPair::KeyName
+Description: Name of an existing EC2 KeyPair to enable access to instances.
+   #+END_SRC
+
+** Resources
+*** AppInstance
+    #+NAME:app-instance
+    #+BEGIN_SRC yaml :noweb yes
+Type: AWS::EC2::Instance
+Properties:
+  ImageId: !Ref Ec2ImageId
+  InstanceType: !Ref Ec2InstanceType
+  KeyName: !Ref Ec2KeyName  
+  SubnetId:
+    Fn::ImportValue: !Sub ${Prefix}-subnet1
+  SecurityGroupIds:
+    - Fn::ImportValue: !Sub ${Prefix}-app-sg
+  UserData:
+    Fn::Base64: !Sub |
+      <<app-userdata>>
+  Tags:
+    - Key: Name
+      Value: !Sub ${Prefix}-ec2-app
+    #+END_SRC
+
+*** UserData
+    #+NAME:app-userdata
+    #+BEGIN_SRC powershell
+<powershell>
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings" /f /v ProxyEnable /t reg_dword /d 1
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings" /f /v ProxyServer /t reg_sz /d ${ProxyIp}:3128
+</powershell>
+    #+END_SRC
+
+** Outputs
+    #+NAME:outputs-ec2-app
+    #+BEGIN_SRC yaml
+AppInstance:
+  Value: !Ref AppInstance
+  Export:
+    Name: !Sub ${Prefix}-ec2-app
+PublicIp:
+  Description: AppServer Public IP
+  Value: !GetAtt AppInstance.PublicIp
+    #+END_SRC
+* CFn: EC2 (Service)
+  file:./12-ec2-service.yaml
+  - ec2-service :: 
+  #+BEGIN_SRC yaml :noweb yes :tangle 12-ec2-service.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 instance (service)
+Parameters:
+  Prefix:
+    <<param-prefix>>
+  Ec2ImageId:
+    <<param-ec2imageid-service>>
+  Ec2InstanceType:
+    <<param-ec2instancetype-service>>
+  Ec2KeyName:
+    <<param-ec2keyname-service>>
+ 
+Resources:
+  ServiceInstance:
+    <<service-instance>>
+
+Outputs:
+  <<outputs-ec2-service>>
+  #+END_SRC
+  
+** Parameters
+   #+NAME:param-ec2imageid-service
+   #+BEGIN_SRC yaml
+Type: AWS::SSM::Parameter::Value<String>
+Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+   #+END_SRC
+
+   #+NAME:param-ec2instancetype-service
+   #+BEGIN_SRC yaml    
+Type: String
+Default: t3.nano
+   #+END_SRC
+
+   #+NAME:param-ec2keyname-service
+   #+BEGIN_SRC yaml
+Type: AWS::EC2::KeyPair::KeyName
+Description: Name of an existing EC2 KeyPair to enable access to instances.
+   #+END_SRC
+** Resources
+*** ServiceInstance
+    #+NAME:service-instance
+    #+BEGIN_SRC yaml :noweb yes
+Type: AWS::EC2::Instance
+Properties:
+  ImageId: !Ref Ec2ImageId
+  InstanceType: !Ref Ec2InstanceType
+  KeyName: !Ref Ec2KeyName  
+  SubnetId:
+    Fn::ImportValue: !Sub ${Prefix}-subnet3
+  SecurityGroupIds:
+    - Fn::ImportValue: !Sub ${Prefix}-service-sg
+  UserData:
+    Fn::Base64: !Sub |
+      <<service-userdata>>
+  Tags:
+    - Key: Name
+      Value: !Sub ${Prefix}-ec2-service
+    #+END_SRC
+
+*** Userdata
+    #+NAME:service-userdata
+    #+BEGIN_SRC bash
+#!/bin/bash
+sudo yum update -y
+sudo yum install httpd -y
+
+sudo systemctl start httpd
+sudo systemctl enable httpd
+    #+END_SRC
+
+** Outputs
+   #+NAME:outputs-ec2-service
+   #+BEGIN_SRC yaml
+ServiceInstance:
+  Value: !Ref ServiceInstance
+  Export:
+    Name: !Sub ${Prefix}-ec2-service
+PublicIp:
+  Description: ServiceServer Public IP
+  Value: !GetAtt ServiceInstance.PublicIp
+PrivateIp:
+  Description: ServiceServer Private IP
+  Value: !GetAtt ServiceInstance.PrivateIp
+   #+END_SRC
+* CFn: Scripts
+** igw
+   #+NAME:igw
+   #+BEGIN_SRC python :results output silent :var name=""
+print('''\
+Type: AWS::EC2::InternetGateway
+Properties:
+  Tags:
+  - Key: Name
+    Value: %s\
+''' % (name), end='')
+   #+END_SRC
+** igw-attach
+   #+NAME:igw-attach
+   #+BEGIN_SRC python :results output silent :var igwid="" vpcid=""
+print('''\
+Type: AWS::EC2::VPCGatewayAttachment
+Properties: 
+  InternetGatewayId: %s
+  VpcId: %s\
+''' % (igwid, vpcid), end='')
+   #+END_SRC
+** vpc
+   #+NAME:vpc
+   #+BEGIN_SRC python :results output silent :var cidr="10.0.0.0/16" name=""
+print('''\
+Type: AWS::EC2::VPC
+Properties:
+  CidrBlock: %s
+  EnableDnsSupport: true
+  EnableDnsHostnames: true
+  Tags:
+    - Key: Name
+      Value: %s\
+''' % (cidr, name), end='')
+   #+END_SRC
+
+** subnet
+   #+NAME:subnet
+   #+BEGIN_SRC python :results output silent :var vpcid="" az="" cidr="" name=""
+print('''\
+Type: AWS::EC2::Subnet
+Properties:
+  VpcId: %s
+  AvailabilityZone: %s
+  CidrBlock: %s
+  MapPublicIpOnLaunch: True
+  Tags:
+    - Key: Name
+      Value: %s
+\
+''' % (vpcid, az, cidr, name), end='')
+   #+END_SRC
+* squid.conf
+  #+BEGIN_SRC text :tangle squid.conf
+#
+# Recommended minimum configuration:
+#
+
+# Example rule allowing access from your local networks.
+# Adapt to list your (internal) IP networks from where browsing
+# should be allowed
+acl localnet src 192.168.0.0/24	# VPC Network (Application side)
+
+acl SSL_ports port 443
+acl Safe_ports port 443		# https
+acl Safe_ports port 80		# http
+acl Safe_ports port 21		# ftp
+acl CONNECT method CONNECT
+
+#
+# Recommended minimum Access Permission configuration:
+#
+# Deny requests to certain unsafe ports
+http_access deny !Safe_ports
+
+# Deny CONNECT to other than secure SSL ports
+http_access deny CONNECT !SSL_ports
+
+# Only allow cachemgr access from localhost
+http_access allow localhost manager
+http_access deny manager
+
+# We strongly recommend the following be uncommented to protect innocent
+# web applications running on the proxy server who think the only
+# one who can access services on "localhost" is a local user
+#http_access deny to_localhost
+
+#
+# INSERT YOUR OWN RULE(S) HERE TO ALLOW ACCESS FROM YOUR CLIENTS
+#
+
+# Example rule allowing access from your local networks.
+# Adapt localnet in the ACL section to list your (internal) IP networks
+# from where browsing should be allowed
+http_access allow localnet
+http_access allow localhost
+
+# And finally deny all other access to this proxy
+http_access deny all
+
+# Squid normally listens to port 3128
+http_port 3128
+
+# Uncomment and adjust the following to add a disk cache directory.
+#cache_dir ufs /var/spool/squid 100 16 256
+
+# Leave coredumps in the first cache dir
+coredump_dir /var/spool/squid
+
+#
+# Add any of your own refresh_pattern entries above these.
+#
+refresh_pattern ^ftp:		1440	20%	10080
+refresh_pattern ^gopher:	1440	0%	1440
+refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
+refresh_pattern .		0	20%	4320    
+  #+END_SRC
