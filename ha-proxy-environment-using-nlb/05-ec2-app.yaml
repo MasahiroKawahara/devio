@@ -30,14 +30,15 @@ Resources:
         Fn::Base64:
           Fn::Join:
             - ""
-            - - !Sub |
-                <powershell>
-                reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings" /f /v ProxyEnable /t reg_dword /d 1
-              - reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings" /f /v ProxyServer /t reg_sz /d
-              - " "
+            - - '<powershell>'
+              - "\n"
+              - 'reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings" /f /v ProxyEnable /t reg_dword /d 1'
+              - "\n"
+              - 'reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings" /f /v ProxyServer /t reg_sz /d '
               - Fn::ImportValue: !Sub ${Prefix}-nlb-dns-name
-              - ":3128\n"
-              - "</powershell>"
+              - ':3128'
+              - "\n"
+              - '</powershell>'
           
       Tags:
         - Key: Name
