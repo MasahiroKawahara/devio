@@ -17,21 +17,21 @@ Resources:
   LaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
+      LaunchConfigurationName: !Sub ${Prefix}-launch-configuration
       ImageId: !Ref ProxyServerImageId
       InstanceType: t3.micro
-      LaunchConfigurationName: !Sub ${Prefix}-launch-configuration
-      InstanceMonitoring: False
-      AssociatePublicIpAddress: True
-      # AssociatePublicIpAddress: False
+      SecurityGroups: 
+        - Fn::ImportValue: !Sub ${Prefix}-proxy-sg
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
           Ebs:
             DeleteOnTermination: True
             VolumeType: gp2
             VolumeSize: 8
-      SecurityGroups: 
-        - Fn::ImportValue: !Sub ${Prefix}-proxy-sg
       KeyName: !Ref Ec2KeyName
+      InstanceMonitoring: False
+      AssociatePublicIpAddress: True
+      # AssociatePublicIpAddress: False
       # 
       # SpotPrice: String
       # IamInstanceProfile: String
@@ -77,7 +77,7 @@ Resources:
       # PlacementGroup: String
 
 Outputs:
-  NLB:
+  AutoScalingGroup:
     Value: !Ref AutoScalingGroup
     Export:
       Name: !Sub ${Prefix}-as-group

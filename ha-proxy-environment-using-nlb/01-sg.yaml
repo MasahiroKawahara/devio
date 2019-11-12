@@ -46,10 +46,10 @@ Resources:
           FromPort: 3128
           ToPort: 3128
           CidrIp: 192.168.0.0/24
-        - IpProtocol: tcp
-          FromPort: 3128
-          ToPort: 3128
-          SourceSecurityGroupId: !Ref AppSG
+        # - IpProtocol: tcp
+        #   FromPort: 3128
+        #   ToPort: 3128
+        #   SourceSecurityGroupId: !Ref AppSG
       Tags: 
         - Key: Name
           Value: !Sub ${Prefix}-proxy-sg
