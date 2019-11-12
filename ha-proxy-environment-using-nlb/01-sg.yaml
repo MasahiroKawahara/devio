@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Security Groups
+Parameters:
+  Prefix:
+    Description: Enter a prefix of this system.
+    Type: String
+    Default: devio-ha-proxy
+  GlobalIP:
+    Description: Enter a globalIP of your environment
+    Type: String
+    Default: 0.0.0.0
+
+Resources:
+  AppSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: SG for App Server
+      GroupName: !Sub ${Prefix}-app-sg
+      VpcId:
+        Fn::ImportValue: !Sub ${Prefix}-vpc1
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: !Sub ${GlobalIP}/32
+      Tags: 
+        - Key: Name
+          Value: !Sub ${Prefix}-app-sg
+  ProxySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: SG for Proxy Server
+      GroupName: !Sub ${Prefix}-proxy-sg
+      VpcId:
+        Fn::ImportValue: !Sub ${Prefix}-vpc2
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Sub ${GlobalIP}/32
+        - IpProtocol: tcp
+          FromPort: 3128
+          ToPort: 3128
+          CidrIp: 10.0.0.0/24
+        - IpProtocol: tcp
+          FromPort: 3128
+          ToPort: 3128
+          CidrIp: 192.168.0.0/24
+        - IpProtocol: tcp
+          FromPort: 3128
+          ToPort: 3128
+          SourceSecurityGroupId: !Ref AppSG
+      Tags: 
+        - Key: Name
+          Value: !Sub ${Prefix}-proxy-sg
+  ServiceSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: SG for Service Server
+      GroupName: !Sub ${Prefix}-service-sg
+      VpcId:
+        Fn::ImportValue: !Sub ${Prefix}-vpc3
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Sub ${GlobalIP}/32
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref ProxySG
+      Tags: 
+        - Key: Name
+          Value: !Sub ${Prefix}-service-sg
+
+Outputs:
+  AppSG:
+    Value: !Ref AppSG
+    Export:
+      Name: !Sub ${Prefix}-app-sg
+  ProxySG:
+    Value: !Ref ProxySG
+    Export:
+      Name: !Sub ${Prefix}-proxy-sg
+  ServiceSG:
+    Value: !Ref ServiceSG
+    Export:
+      Name: !Sub ${Prefix}-service-sg

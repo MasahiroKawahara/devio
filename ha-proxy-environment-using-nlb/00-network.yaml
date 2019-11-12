@@ -1,0 +1,283 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC Network
+Parameters:
+  Prefix:
+    Description: Enter a prefix of this system.
+    Type: String
+    Default: devio-ha-proxy
+
+Resources:
+  # VPC
+  VPC1:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 192.168.0.0/24
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-vpc1
+  VPC2:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/24
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-vpc2
+  VPC3:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.200.0/24
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-vpc3
+
+  # IGW
+  IGW1:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: !Sub ${Prefix}-igw1
+  IGW1Attach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref IGW1
+      VpcId: !Ref VPC1
+  IGW2:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: !Sub ${Prefix}-igw2
+  IGW2Attach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref IGW2
+      VpcId: !Ref VPC2
+  IGW3:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: !Sub ${Prefix}-igw3
+  IGW3Attach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref IGW3
+      VpcId: !Ref VPC3
+
+  # VPCPeering
+  VPCPeering:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties: 
+      VpcId: !Ref VPC1
+      PeerVpcId: !Ref VPC2
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-vpcpeering
+  VPCPeeringDx:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties: 
+      VpcId: !Ref VPC2
+      PeerVpcId: !Ref VPC3
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-vpcpeering-dx
+
+  # Subnet
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC1
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 192.168.0.0/27
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-subnet1
+    
+  Subnet2a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC2
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.0.0/27
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-subnet2-a
+    
+  Subnet2c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC2
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.0.32/27
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-subnet2-c
+    
+  Subnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC3
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.200.0/27
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-subnet3
+    
+
+  # Routing
+  RouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC1
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-route-table-1
+  RouteTable1Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      SubnetId: !Ref Subnet1
+  Route1a:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW1
+  Route1b:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      DestinationCidrBlock: 10.0.0.0/24
+      VpcPeeringConnectionId: !Ref VPCPeering
+  RouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC2
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-route-table-2
+  RouteTable2AssociationA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable2
+      SubnetId: !Ref Subnet2a
+  RouteTable2AssociationC:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable2
+      SubnetId: !Ref Subnet2c
+  Route2a:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable2
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW2
+  Route2b:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable2
+      DestinationCidrBlock: 192.168.0.0/24
+      VpcPeeringConnectionId: !Ref VPCPeering
+  Route2c:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable2
+      DestinationCidrBlock: 10.0.200.0/24
+      VpcPeeringConnectionId: !Ref VPCPeeringDx
+  RouteTable3:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC3
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-route-table-3
+  RouteTable3Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable3
+      SubnetId: !Ref Subnet3
+  Route3a:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable3
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW3
+  Route3b:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable3
+      DestinationCidrBlock: 10.0.0.0/24
+      VpcPeeringConnectionId: !Ref VPCPeeringDx
+
+Outputs:
+  VPC1:
+    Value: !Ref VPC1
+    Export:
+      Name: !Sub ${Prefix}-vpc1
+  VPC2:
+    Value: !Ref VPC2
+    Export:
+      Name: !Sub ${Prefix}-vpc2
+  VPC3:
+    Value: !Ref VPC3
+    Export:
+      Name: !Sub ${Prefix}-vpc3
+  IGW1:
+    Value: !Ref IGW1
+    Export:
+      Name: !Sub ${Prefix}-igw1
+  IGW2:
+    Value: !Ref IGW2
+    Export:
+      Name: !Sub ${Prefix}-igw2
+  IGW3:
+    Value: !Ref IGW3
+    Export:
+      Name: !Sub ${Prefix}-igw3
+  VPCPeering:
+    Value: !Ref VPCPeering
+    Export:
+      Name: !Sub ${Prefix}-vpcpeering
+  VPCPeeringDX:
+    Value: !Ref VPCPeeringDx
+    Export:
+      Name: !Sub ${Prefix}-vpcpeering-dx
+  Subnet1:
+    Value: !Ref Subnet1
+    Export:
+      Name: !Sub ${Prefix}-subnet1
+  Subnet2a:
+    Value: !Ref Subnet2a
+    Export:
+      Name: !Sub ${Prefix}-subnet2-a
+  Subnet2c:
+    Value: !Ref Subnet2c
+    Export:
+      Name: !Sub ${Prefix}-subnet2-c
+  Subnet3:
+    Value: !Ref Subnet3
+    Export:
+      Name: !Sub ${Prefix}-subnet3
+  RouteTable1:
+    Value: !Ref RouteTable1
+    Export:
+      Name: !Sub ${Prefix}-route-table-1
+  RouteTable2:
+    Value: !Ref RouteTable2
+    Export:
+      Name: !Sub ${Prefix}-route-table-2
+  RouteTable3:
+    Value: !Ref RouteTable3
+    Export:
+      Name: !Sub ${Prefix}-route-table-3

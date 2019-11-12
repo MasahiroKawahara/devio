@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: NLB
+Parameters:
+  Prefix:
+    Description: Enter a prefix of this system.
+    Type: String
+    Default: devio-ha-proxy
+
+Resources:
+  NLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      Type: network
+      Scheme: internal
+      IpAddressType: ipv4
+      Subnets: 
+        - Fn::ImportValue: !Sub ${Prefix}-subnet2-a
+        - Fn::ImportValue: !Sub ${Prefix}-subnet2-c
+      Name: !Sub ${Prefix}-nlb
+      # LoadBalancerAttributes: --> see later
+      # SecurityGroups: --> not requied in NLB
+      # SubnetMappings: --> not requied in Internal NLB
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-nlb
+  NLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      Name: !Sub ${Prefix}-nlb-tg
+      TargetType: instance
+      Protocol: TCP
+      Port: 3128 # squid
+      VpcId:
+        Fn::ImportValue: !Sub ${Prefix}-vpc2
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-nlb-tg
+      # 
+      # HealthCheckEnabled: Boolean
+      # HealthCheckIntervalSeconds: Integer
+      # HealthCheckPath: String
+      # HealthCheckPort: String
+      # HealthCheckProtocol: String
+      # HealthCheckTimeoutSeconds: Integer
+      # HealthyThresholdCount: Integer
+      # Matcher: Matcher
+      # TargetGroupAttributes: 
+      #   - Key: proxy_protocol_v2.enabled
+      #     Value: false
+      #   - Key: deregistration_delay.timeout_seconds
+      #     Value: 300
+      # Targets: - TargetDescription
+      # UnhealthyThresholdCount: Integer
+  NLBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      DefaultActions: 
+        - Type: forward
+          TargetGroupArn: !Ref NLBTargetGroup
+      LoadBalancerArn: !Ref NLB
+      Port: 3128
+      Protocol: TCP
+      # SslPolicy: String
+      # Certificates: - Certificate
+
+Outputs:
+  NLBDNSName:
+    Value: !GetAtt NLB.DNSName
+    Export:
+      Name: !Sub ${Prefix}-nlb-dns-name
+  NLB:
+    Value: !Ref NLB
+    Export:
+      Name: !Sub ${Prefix}-nlb
+  NLBTargetGroup:
+    Value: !Ref NLBTargetGroup
+    Export:
+      Name: !Sub ${Prefix}-nlb-tg

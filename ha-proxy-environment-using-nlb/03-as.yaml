@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AutoScaling
+Parameters:
+  Prefix:
+    Description: Enter a prefix of this system.
+    Type: String
+    Default: devio-ha-proxy
+  ProxyServerImageId:
+    Description: Enter a image id of the proxy server
+    Type: AWS::EC2::Image::Id
+    Default: ami-0952f357282c5e6c8
+  Ec2KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable access to instances.
+
+Resources:
+  LaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref ProxyServerImageId
+      InstanceType: t3.micro
+      LaunchConfigurationName: !Sub ${Prefix}-launch-configuration
+      InstanceMonitoring: False
+      AssociatePublicIpAddress: True
+      # AssociatePublicIpAddress: False
+      BlockDeviceMappings: 
+        - DeviceName: /dev/xvda
+          Ebs:
+            DeleteOnTermination: True
+            VolumeType: gp2
+            VolumeSize: 8
+      SecurityGroups: 
+        - Fn::ImportValue: !Sub ${Prefix}-proxy-sg
+      KeyName: !Ref Ec2KeyName
+      # 
+      # SpotPrice: String
+      # IamInstanceProfile: String
+      # EbsOptimized: Boolean
+      # KernelId: String
+      # RamDiskId: String
+      # UserData: String
+      # ClassicLinkVPCId: String
+      # ClassicLinkVPCSecurityGroups: - String
+      # InstanceId: String
+      # PlacementTenancy: String
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties: 
+      LaunchConfigurationName: !Ref LaunchConfiguration
+      AutoScalingGroupName: !Sub ${Prefix}-as-group
+      DesiredCapacity: 2
+      MaxSize: 2
+      MinSize: 2
+      VPCZoneIdentifier:
+        - Fn::ImportValue: !Sub ${Prefix}-subnet2-a
+        - Fn::ImportValue: !Sub ${Prefix}-subnet2-c
+      TargetGroupARNs: 
+        - Fn::ImportValue: !Sub ${Prefix}-nlb-tg
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-as-group
+          PropagateAtLaunch: true
+      # 
+      # LoadBalancerNames: - String
+      # ServiceLinkedRoleARN: String
+      # LaunchTemplate: LaunchTemplateSpecification
+      # InstanceId: String
+      # MixedInstancesPolicy: MixedInstancesPolicy
+      # NotificationConfigurations: - NotificationConfiguration
+      # TerminationPolicies: - String
+      # AvailabilityZones: - String
+      # Cooldown: String
+      # LifecycleHookSpecificationList: - LifecycleHookSpecification
+      # MetricsCollection: - MetricsCollection
+      # PlacementGroup: String
+
+Outputs:
+  NLB:
+    Value: !Ref AutoScalingGroup
+    Export:
+      Name: !Sub ${Prefix}-as-group
