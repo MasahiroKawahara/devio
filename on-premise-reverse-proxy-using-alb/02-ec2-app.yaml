@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 instance (app)
+Parameters:
+  Prefix:
+    Description: Enter a prefix of this system.
+    Type: String
+    Default: devio-alb-iptg
+  Ec2ImageId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /aws/service/ami-windows-latest/Windows_Server-2019-Japanese-Full-Base
+  Ec2InstanceType:
+    Type: String
+    Default: t3.micro
+  Ec2KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable access to instances.
+ 
+Resources:
+  AppInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref Ec2ImageId
+      InstanceType: !Ref Ec2InstanceType
+      KeyName: !Ref Ec2KeyName  
+      SubnetId:
+        Fn::ImportValue: !Sub ${Prefix}-subnet1
+      SecurityGroupIds:
+        - Fn::ImportValue: !Sub ${Prefix}-sg-app
+          
+      Tags:
+        - Key: Name
+          Value: !Sub ${Prefix}-ec2-app
+
+Outputs:
+  AppInstance:
+    Value: !Ref AppInstance
+    Export:
+      Name: !Sub ${Prefix}-ec2-app
+  PublicIp:
+    Description: AppServer Public IP
+    Value: !GetAtt AppInstance.PublicIp

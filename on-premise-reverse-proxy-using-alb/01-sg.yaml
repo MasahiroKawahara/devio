@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Security Groups
+Parameters:
+  Prefix:
+    Description: Enter a prefix of this system.
+    Type: String
+    Default: devio-alb-iptg
+  GlobalIP:
+    Description: Enter a globalIP of your environment
+    Type: String
+    Default: 0.0.0.0
+
+Resources:
+  SgApp:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: SG for App Server
+      GroupName: !Sub ${Prefix}-sg-app
+      VpcId:
+        Fn::ImportValue: !Sub ${Prefix}-vpc1
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: !Sub ${GlobalIP}/32
+      Tags: 
+        - Key: Name
+          Value: !Sub ${Prefix}-sg-app
+  SgAlb:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: SG for ALB
+      GroupName: !Sub ${Prefix}-sg-alb
+      VpcId:
+        Fn::ImportValue: !Sub ${Prefix}-vpc2
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref SgApp
+      Tags: 
+        - Key: Name
+          Value: !Sub ${Prefix}-sg-alb
+
+Outputs:
+  SgApp:
+    Value: !Ref SgApp
+    Export:
+      Name: !Sub ${Prefix}-sg-app
+  SgAlb:
+    Value: !Ref SgAlb
+    Export:
+      Name: !Sub ${Prefix}-sg-alb
