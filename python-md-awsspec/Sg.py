@@ -93,6 +93,7 @@ df_sgs.index = df_sgs.index + 1
 # display
 print('## SecurityGroups 一覧')
 print(df_sgs.to_markdown())
+print('')
 
 
 # ## 各 Security Group Rules
