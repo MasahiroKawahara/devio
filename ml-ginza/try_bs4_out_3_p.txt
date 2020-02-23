@@ -1,0 +1,64 @@
+こちらはラスベガスで開催された AWS re:Invent2019のセッションThe right AWS network architecture for the right reason #NET320のレポートです。
+Transit Gateway/PrivateLink などの新サービス登場や既存サービスのアップデートとともに、AWSにおけるネットワーク構成の選択肢は増え続けています。
+本セッションは、今のAWSにおけるネットワーク構成が網羅されている良いセッションでした。
+本ブログでは、このセッションで出てきたAWSネットワークアーキテクチャ パターンを紹介 していきます。
+項目が多いので以下に目次を作成しています。目次のリンクから気になるアーキテクチャを参照ください。
+ネットワークインフラを構築するときに、まず作成するのは VPCです。その VPCをどのように構成するかは重要です。
+本章は 1 VPCでシステムを構築・運用する構成 について紹介します。
+一番シンプルな構成です。システム領域の分割は サブネットやルートテーブル、NACLなどを用いて行います。
+システムの規模が大きくなって使えるIPレンジが無くなってきた…
+その場合は VPCの CIDR拡張 が行えます。
+↑ は 既存の 10.0.0.0/16 VPCにSecondary CIDR として 10.1.0.0/16 を追加した構成例です。
+1 VPCのシステムを 複数のアカウントで構築・運用 したいケースを考えます。
+その場合は AWS Resource Access Manager(RAM) を使えます。
+といった制御ができます。
+ネットワークインフラを構築するときに、まず作成するのは VPCです。その VPCをどのように構成するかは重要です。
+本章は
+について紹介します。
+既存VPC と完全に独立した環境で新規システムを構築したい、要求があったとします。そういった場合は VPCを複数作成して対応します。
+大きい組織ですと
+ケースが出てきます。
+そういったケースには マルチアカウントで対応するでしょう。
+VPC間を接続する シンプルな方法として VPC ピアリング があります。
+リージョンや AWSアカウントを跨いた接続のサポート、スケーリングや高い冗長性などが特徴です。
+一方で 以下のような欠点もあります。
+▼ 「推移的なルーティング」 はできない
+▼ 規模がでかくなるにつれて ピアリング接続の管理が大変になる
+(極端な例ですが) 100 VPCをフルメッシュで VPCピアリング接続する場合、4,950 ものピアリング接続が必要となります。
+Transit Gateway によって ネットワークのハブ接続を可能にします。複数のVPC間で通信を行いたい場合も 1 Transit Gateway をアタッチするだけで実現できます。
+また、 Transit Gateway はオンプレミス ネットワークとの接続もサポートしています。
+この Transit Gateway でできることは多岐にわたります。Transit Gateway 固有のアーキテクチャは Transit Gateway 章にて説明しています。
+ハイブリッドクラウドの構成で使用される サイト間VPN (Site-to-Site VPN)の接続方法 3種類を紹介します。
+サイト間VPNを Transit Gateway(TGW) を用いて構築します。TGW はリージョン単位のサービスなので、リージョン内の各VPCと接続、ルート制御が可能です。
+また、本セッションでは言及されていませんでしたが、TGWを用いたサイト間VPNの接続オプションとして、高可用性・高パフォーマンスなAccelerated Site-to-Site VPN が re:Invent2019後から選択可能になりました。
+[速報] AWS Accelerated Site to site VPN Connectionsがリリースされました！ #reinvent
+仮想プライベートゲートウェイ (Virtual Private Gateway: VGW)を使って オンプレミスとVPCを 1対1接続する構成です。
+EC2インスタンス上に Openswanなどの VPNソフトウェアを起動してオンプレミスと接続する方法です。
+ハイブリッドクラウドの構成で使用される Direct Connect(DX)の接続方法 3種類を紹介します。
+Private Virtual Interface(VIF) を VPCにアタッチしたVirtual Private Gateway (VGW) へ接続 する方法です。
+Private VIFを Direct Connect Gateway(DX Gateway) へ接続します。
+DX Gateway と 任意リージョンのVPC が接続できます ( 10 VPCまで )
+DX Gateway と TGW を用いる方法です。1 DX Gateway につき 3 TGWまで 接続可能です。
+オンプレミスとAWSで重複する IPアドレスが存在するときの対策です。
+PrivateLink + Network Load Balancer で実現します。CIDR が 重複しないNAT用 VPC を準備します。
+同じく PrivateLink + Network Load Balancer で実現します。CIDR が 重複しないNAT用 VPC を準備します。
+ハイブリッドネットワークにおける 名前解決(DNS) の実装方法についてです。2018年にローンチした Route 53 Resolver が活躍します。
+Route 53 Resolver の以下 3つの構成要素を作成して実現します。
+Route 53 Resolver の詳細については 以下 Black Belt などがとても参考になります。参照ください。
+Transit Gateway(TGW) によって ネットワークのハブ接続を可能にします。複数のVPC間で通信を行いたい場合も 1 TGW をアタッチするだけで実現できます。
+本章ではセッションで紹介された TGWルートドメインを活用したアーキテクチャ を記載していきいます。
+共有VPC (Shared services VPC) の役割をもたせるアーキテクチャです。
+上記 ルールを満たすために、ルートテーブルを 2種類作成しています。
+通信を 特定のセキュリティアプライアンス経由で流したい、要求を実現するアーキテクチャです。
+本セッション外ですが、Transit Gateway の詳細については以下のセッションやTransit Gateway Reference Architecture が参考になります。ぜひ参照ください。
+[レポート] 新サービスの紹介も！複数 VPC における Transit Gateway のリファレンスアーキテクチャ #NET406 #reinvent
+AWS PrivateLink は AWSでホストされているサービスに、安全にアクセスできる機能です。TCP経由 の通信のみサポートしています。
+VPC ピアリングや Transit Gateway と違って、PrivateLinkは 特定のポート、特定のIPアドレス のサービスを利用するために、VPC間に通信の経路を作成する用途で使用されます。
+ハイブリッドネットワーク アーキテクチャ (IP重複対策) で話したとおり、IP重複の対策として利用できます。
+PrivateLinkを利用したアーキテクチャとして、 VPCエンドポイントの集中化 が紹介されています。
+を前述の Shared Service VPC 構成の 共有VPCに集めて設定します。
+他の VPCと Shared Service VPC間でプライベートホストゾーンを共有 できるようにするために、関連付けを行います。
+集中化させることで、エンドポイントの設置台数が減り PrivateLink関連のコストを削減することが出来ます。
+以上、 The right AWS network architecture for the right reason #NET320のレポートでした。
+各アーキテクチャの長所・短所やアーキテクチャを決定する際のポイントなど、セッションでは言及されています。気になった方はぜひセッションの動画も御覧ください。
+各アーキテクチャを整理・理解することでAWSのネットワークサービスについて広く理解が得られました。

@@ -1,0 +1,49 @@
+フラットネットワーク アーキテクチャ (Single VPC)
+シングルアカウント構成
+マルチアカウント構成 (Resource Access Manager)
+分割ネットワーク アーキテクチャ (Multi VPC)
+シングルアカウント構成
+マルチアカウント構成
+VPC間の接続 (VPC ピアリング)
+VPC間の接続 (Transit Gateway)
+サイト間VPN
+Transit Gateway
+仮想プライベートゲートウェイ
+ソフトウェアVPN on EC2
+Direct Connect
+仮想プライベートゲートウェイ
+Direct Connect Gateway + 仮想プライベートゲートウェイ
+Direct Connect Gateway + Transit Gateway
+IP重複対策
+AWS → オンプレミス 向き (PrivateLink + NLB)
+オンプレミス → AWS 向き (PrivateLink + NLB)
+DNS
+Route 53 Resolver
+Transit Gateway
+Shared service VPC
+Bump-in-the-wire VPC
+その他 (TGW詳細)
+PrivateLink
+VPCエンドポイントの集中化
+このサブネット内のリソースは アカウント Blue に共有する
+あのサブネット内のリソースは アカウント Purple に共有する
+複数 VPCでシステムを構築・運用する構成
+VPC間の接続方法
+チーム毎にAWSアカウントを作成してアクセス制御を行ったり、
+事業単位やワークロード単位で独立させたい
+アクセス元VPCに PrivateLink を配置
+NAT用 VPCに Network Load Balancer を配置
+Network Load Balancer の IPターゲット にオンプレミスサーバーのIPアドレス を指定
+NAT用 VPCに PrivateLink を配置
+アクセス先VPCに Network Load Balancer を配置
+Network Load Balancer の IPターゲット に AWSの EC2やRDSの IPアドレス を指定
+Inbound Endpoint: オンプレミス環境から VPC向けの名前解決を行うためのエンドポイント
+Outbound Endpoint: VPC環境から オンプレミス向けの名前解決を行うためのエンドポイント
+Resolver Rules: フォワーディングのルールを定義
+App1, App2, App3 は 相互にアクセスできない
+App1, App2, App3 は Shared services VPC と オンプレ環境 にアクセスできる
+App1, App2 から発信された通信は TGWを経由して Bump-in-the-wire VPC へ向かいます
+Bump-in-the-wire VPC のメインルートテーブルの デフォルトゲートウェイは セキュリティアプライアンスのENI なので、App1, App2 からの通信は セキュリティアプライアンスへ向かうことになります
+セキュリティアプライアンスがあるサブネットのルートテーブル により、App1, App2 の所望の通信先へと向かいます
+VPCエンドポイントと
+別名登録のためのRoute 53 プライベートホストゾーン

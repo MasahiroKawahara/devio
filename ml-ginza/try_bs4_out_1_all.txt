@@ -1,0 +1,1393 @@
+﻿
+
+
+
+[レポート] AWS ネットワークアーキテクチャ 総まとめ！ #NET320 #reinvent ｜ Developers.IO
+(window.NREUM||(NREUM={})).loader_config={licenseKey:"b892d0f53f",applicationID:"484678717"};window.NREUM||(NREUM={}),__nr_require=function(e,n,t){function r(t){if(!n[t]){var i=n[t]={exports:{}};e[t][0].call(i.exports,function(n){var i=e[t][1][n];return r(i||n)},i,i.exports)}return n[t].exports}if("function"==typeof __nr_require)return __nr_require;for(var i=0;i<t.length;i++)r(t[i]);return r}({1:[function(e,n,t){function r(){}function i(e,n,t){return function(){return o(e,[u.now()].concat(f(arguments)),n?null:this,t),n?void 0:this}}var o=e("handle"),a=e(4),f=e(5),c=e("ee").get("tracer"),u=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var p=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",d=l+"ixn-";a(p,function(e,n){s[n]=i(l+n,!0,"api")}),s.addPageAction=i(l+"addPageAction",!0),s.setCurrentRouteName=i(l+"routeName",!0),n.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,n){var t={},r=this,i="function"==typeof n;return o(d+"tracer",[u.now(),e,t],r),function(){if(c.emit((i?"":"no-")+"fn-start",[u.now(),r,i],t),i)try{return n.apply(this,arguments)}catch(e){throw c.emit("fn-err",[arguments,this,e],t),e}finally{c.emit("fn-end",[u.now()],t)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,n){m[n]=i(d+n)}),newrelic.noticeError=function(e,n){"string"==typeof e&&(e=new Error(e)),o("err",[e,u.now(),!1,n])}},{}],2:[function(e,n,t){function r(e,n){var t=e.getEntries();t.forEach(function(e){"first-paint"===e.name?c("timing",["fp",Math.floor(e.startTime)]):"first-contentful-paint"===e.name&&c("timing",["fcp",Math.floor(e.startTime)])})}function i(e,n){var t=e.getEntries();t.length>0&&c("lcp",[t[t.length-1]])}function o(e){if(e instanceof s&&!l){var n,t=Math.round(e.timeStamp);n=t>1e12?Date.now()-t:u.now()-t,l=!0,c("timing",["fi",t,{type:e.type,fid:n}])}}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var a,f,c=e("handle"),u=e("loader"),s=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){a=new PerformanceObserver(r),f=new PerformanceObserver(i);try{a.observe({entryTypes:["paint"]}),f.observe({entryTypes:["largest-contentful-paint"]})}catch(p){}}if("addEventListener"in document){var l=!1,d=["click","keydown","mousedown","pointerdown","touchstart"];d.forEach(function(e){document.addEventListener(e,o,!1)})}}},{}],3:[function(e,n,t){function r(e,n){if(!i)return!1;if(e!==i)return!1;if(!n)return!0;if(!o)return!1;for(var t=o.split("."),r=n.split("."),a=0;a<r.length;a++)if(r[a]!==t[a])return!1;return!0}var i=null,o=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var f=navigator.userAgent,c=f.match(a);c&&f.indexOf("Chrome")===-1&&f.indexOf("Chromium")===-1&&(i="Safari",o=c[1])}n.exports={agent:i,version:o,match:r}},{}],4:[function(e,n,t){function r(e,n){var t=[],r="",o=0;for(r in e)i.call(e,r)&&(t[o]=n(r,e[r]),o+=1);return t}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],5:[function(e,n,t){function r(e,n,t){n||(n=0),"undefined"==typeof t&&(t=e?e.length:0);for(var r=-1,i=t-n||0,o=Array(i<0?0:i);++r<i;)o[r]=e[n+r];return o}n.exports=r},{}],6:[function(e,n,t){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,n,t){function r(){}function i(e){function n(e){return e&&e instanceof r?e:e?c(e,f,o):o()}function t(t,r,i,o){if(!l.aborted||o){e&&e(t,r,i);for(var a=n(i),f=v(t),c=f.length,u=0;u<c;u++)f[u].apply(a,r);var p=s[y[t]];return p&&p.push([b,t,r,a]),a}}function d(e,n){h[e]=v(e).concat(n)}function m(e,n){var t=h[e];if(t)for(var r=0;r<t.length;r++)t[r]===n&&t.splice(r,1)}function v(e){return h[e]||[]}function g(e){return p[e]=p[e]||i(t)}function w(e,n){u(e,function(e,t){n=n||"feature",y[t]=n,n in s||(s[n]=[])})}var h={},y={},b={on:d,addEventListener:d,removeEventListener:m,emit:t,get:g,listeners:v,context:n,buffer:w,abort:a,aborted:!1};return b}function o(){return new r}function a(){(s.api||s.feature)&&(l.aborted=!0,s=l.backlog={})}var f="nr@context",c=e("gos"),u=e(4),s={},p={},l=n.exports=i();l.backlog=s},{}],gos:[function(e,n,t){function r(e,n,t){if(i.call(e,n))return e[n];var r=t();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,n,{value:r,writable:!0,enumerable:!1}),r}catch(o){}return e[n]=r,r}var i=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(e,n,t){function r(e,n,t,r){i.buffer([e],r),i.emit(e,n,t)}var i=e("ee").get("handle");n.exports=r,r.ee=i},{}],id:[function(e,n,t){function r(e){var n=typeof e;return!e||"object"!==n&&"function"!==n?-1:e===window?0:a(e,o,function(){return i++})}var i=1,o="nr@id",a=e("gos");n.exports=r},{}],loader:[function(e,n,t){function r(){if(!x++){var e=E.info=NREUM.info,n=d.getElementsByTagName("script")[0];if(setTimeout(s.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&n))return s.abort();u(y,function(n,t){e[n]||(e[n]=t)}),c("mark",["onload",a()+E.offset],null,"api");var t=d.createElement("script");t.src="https://"+e.agent,n.parentNode.insertBefore(t,n)}}function i(){"complete"===d.readyState&&o()}function o(){c("mark",["domContent",a()+E.offset],null,"api")}function a(){return O.exists&&performance.now?Math.round(performance.now()):(f=Math.max((new Date).getTime(),f))-E.offset}var f=(new Date).getTime(),c=e("handle"),u=e(4),s=e("ee"),p=e(3),l=window,d=l.document,m="addEventListener",v="attachEvent",g=l.XMLHttpRequest,w=g&&g.prototype;NREUM.o={ST:setTimeout,SI:l.setImmediate,CT:clearTimeout,XHR:g,REQ:l.Request,EV:l.Event,PR:l.Promise,MO:l.MutationObserver};var h=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1167.min.js"},b=g&&w&&w[m]&&!/CriOS/.test(navigator.userAgent),E=n.exports={offset:f,now:a,origin:h,features:{},xhrWrappable:b,userAgent:p};e(1),e(2),d[m]?(d[m]("DOMContentLoaded",o,!1),l[m]("load",r,!1)):(d[v]("onreadystatechange",i),l[v]("onload",r)),c("mark",["firstbyte",f],null,"api");var x=0,O=e(6)},{}],"wrap-function":[function(e,n,t){function r(e){return!(e&&e instanceof Function&&e.apply&&!e[a])}var i=e("ee"),o=e(5),a="nr@original",f=Object.prototype.hasOwnProperty,c=!1;n.exports=function(e,n){function t(e,n,t,i){function nrWrapper(){var r,a,f,c;try{a=this,r=o(arguments),f="function"==typeof t?t(r,a):t||{}}catch(u){l([u,"",[r,a,i],f])}s(n+"start",[r,a,i],f);try{return c=e.apply(a,r)}catch(p){throw s(n+"err",[r,a,p],f),p}finally{s(n+"end",[r,a,c],f)}}return r(e)?e:(n||(n=""),nrWrapper[a]=e,p(e,nrWrapper),nrWrapper)}function u(e,n,i,o){i||(i="");var a,f,c,u="-"===i.charAt(0);for(c=0;c<n.length;c++)f=n[c],a=e[f],r(a)||(e[f]=t(a,u?f+i:i,o,f))}function s(t,r,i){if(!c||n){var o=c;c=!0;try{e.emit(t,r,i,n)}catch(a){l([a,t,r,i])}c=o}}function p(e,n){if(Object.defineProperty&&Object.keys)try{var t=Object.keys(e);return t.forEach(function(t){Object.defineProperty(n,t,{get:function(){return e[t]},set:function(n){return e[t]=n,n}})}),n}catch(r){l([r])}for(var i in e)f.call(e,i)&&(n[i]=e[i]);return n}function l(n){try{e.emit("internal-error",n)}catch(t){}}return e||(e=i),t.inPlace=u,t.flag=a,t}},{}]},{},["loader"]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TJXBQB');
+
+
+
+
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.4\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.4\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/dev.classmethod.jp\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.9.4"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55357,56692,8205,9792,65039],[55357,56692,8203,9792,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		
+
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+Developers.IOproduced byClassmethod
+
+
+
+
+
+
+
+
+
+
+
+
+検索
+		
+
+
+
+
+
+
+
+
+ AWS
+ Alexa
+ モバイル
+ ビッグデータ
+ サーバーレス
+ Tableau
+ Alteryx
+ イベント
+
+
+
+
+
+
+
+
+[レポート] AWS ネットワークアーキテクチャ 総まとめ！ #NET320 #reinvent
+ AWS re:Invent 2019  VPC
+
+
+
+
+        2019年12月24日      
+
+
+ 川原征大（11）
+
+ 75
+
+75件のシェア(ちょっぴり話題の記事)
+
+
+
+
+
+
+
+
+
+
+
+こちらはラスベガスで開催された AWS re:Invent2019のセッション
+The right AWS network architecture for the right reason #NET320
+のレポートです。
+Transit Gateway/PrivateLink などの新サービス登場や
+既存サービスのアップデートとともに、
+AWSにおけるネットワーク構成の選択肢は増え続けています。
+本セッションは、今のAWSにおけるネットワーク構成が網羅されている
+良いセッションでした。
+本ブログでは、このセッションで出てきた
+AWSネットワークアーキテクチャ パターンを紹介 していきます。
+資料
+セッション動画
+
+目次
+項目が多いので以下に目次を作成しています。
+目次のリンクから気になるアーキテクチャを参照ください。
+シングルVPC、マルチVPC
+
+フラットネットワーク アーキテクチャ (Single VPC)
+
+シングルアカウント構成
+マルチアカウント構成 (Resource Access Manager)
+
+
+分割ネットワーク アーキテクチャ (Multi VPC)
+
+シングルアカウント構成
+マルチアカウント構成
+VPC間の接続 (VPC ピアリング)
+VPC間の接続 (Transit Gateway)
+
+
+
+ハイブリッドネットワーク
+
+サイト間VPN
+
+Transit Gateway
+仮想プライベートゲートウェイ
+ソフトウェアVPN on EC2
+
+
+Direct Connect
+
+仮想プライベートゲートウェイ
+Direct Connect Gateway + 仮想プライベートゲートウェイ
+Direct Connect Gateway + Transit Gateway
+
+
+IP重複対策
+
+AWS → オンプレミス 向き (PrivateLink + NLB)
+オンプレミス → AWS 向き (PrivateLink + NLB)
+
+
+DNS
+
+Route 53 Resolver
+
+
+
+サービス別(Transit Gateway、PrivateLink)
+
+Transit Gateway
+
+Shared service VPC
+Bump-in-the-wire VPC
+その他 (TGW詳細)
+
+
+PrivateLink
+
+VPCエンドポイントの集中化
+
+
+
+
+フラットネットワーク アーキテクチャ (Single VPC)
+ネットワークインフラを構築するときに、まず作成するのは VPCです。
+その VPCをどのように構成するかは重要です。
+本章は 1 VPCでシステムを構築・運用する構成 について紹介します。
+
+Single VPC: シングルアカウント構成
+
+一番シンプルな構成です。
+システム領域の分割は サブネットやルートテーブル、NACLなどを用いて行います。
+システムの規模が大きくなって使えるIPレンジが無くなってきた…
+その場合は VPCの CIDR拡張 が行えます。
+
+  Q:VPC のサイズは変更できますか?
+  はい。既存の VPC を拡張するには、4 つのセカンダリ IPv4 IP 範囲 (CIDR) を VPC に追加します。
+  – 引用：Amazon VPC よくある質問
+
+
+↑ は 既存の 10.0.0.0/16 VPCに
+Secondary CIDR として 10.1.0.0/16 を追加した構成例です。
+
+Single VPC: マルチアカウント構成 (Resource Access Manager)
+1 VPCのシステムを 複数のアカウントで構築・運用 したいケースを考えます。
+その場合は AWS Resource Access Manager(RAM) を使えます。
+
+
+  AWS Resource Access Manager (RAM) は、
+  AWS のリソースを任意の AWS アカウントまたは AWS 組織内で簡単かつ安全に共有できるサービスです。
+  AWS Transit Gateway、サブネット、AWS License Manager の設定、Amazon Route 53 リゾルバーのルールのリソースを RAM で共有できます。
+  – 引用：AWS Resource Access Manager
+
+
+このサブネット内のリソースは アカウント Blue に共有する
+あのサブネット内のリソースは アカウント Purple に共有する
+
+といった制御ができます。
+
+分割ネットワーク アーキテクチャ (Multi VPC)
+ネットワークインフラを構築するときに、まず作成するのは VPCです。
+その VPCをどのように構成するかは重要です。
+本章は
+
+複数 VPCでシステムを構築・運用する構成
+VPC間の接続方法
+
+について紹介します。
+
+Multi VPC: シングルアカウント構成
+既存VPC と完全に独立した環境で新規システムを構築したい、要求があったとします。
+そういった場合は VPCを複数作成して対応します。
+
+
+Multi VPC: マルチアカウント構成
+大きい組織ですと
+
+チーム毎にAWSアカウントを作成してアクセス制御を行ったり、
+事業単位やワークロード単位で独立させたい
+
+ケースが出てきます。
+そういったケースには マルチアカウントで対応するでしょう。
+
+
+VPC間の接続 (VPC ピアリング)
+VPC間を接続する シンプルな方法として VPC ピアリング があります。
+
+リージョンや AWSアカウントを跨いた接続のサポート、スケーリングや高い冗長性などが特徴です。
+一方で 以下のような欠点もあります。
+▼ 「推移的なルーティング」 はできない
+
+
+  VPC A を経由して VPC B から VPC C にパケットを直接ルーティングすることはできません。
+  – 引用： サポートされていない VPC ピア接続設定
+
+▼ 規模がでかくなるにつれて ピアリング接続の管理が大変になる
+
+(極端な例ですが) 100 VPCをフルメッシュで VPCピアリング接続する場合、
+4,950 ものピアリング接続が必要となります。
+
+VPC間の接続 (Transit Gateway)
+Transit Gateway によって ネットワークのハブ接続を可能にします。
+複数のVPC間で通信を行いたい場合も 1 Transit Gateway をアタッチするだけで実現できます。
+
+また、 Transit Gateway はオンプレミス ネットワークとの接続もサポートしています。
+
+この Transit Gateway でできることは多岐にわたります。
+Transit Gateway 固有のアーキテクチャは Transit Gateway 章にて説明しています。
+
+ハイブリッドネットワーク アーキテクチャ (サイト間VPN)
+ハイブリッドクラウドの構成で使用される サイト間VPN (Site-to-Site VPN)
+の接続方法 3種類を紹介します。
+
+サイト間VPN: Transit Gateway
+
+サイト間VPNを Transit Gateway(TGW) を用いて構築します。
+TGW はリージョン単位のサービスなので、
+リージョン内の各VPCと接続、ルート制御が可能です。
+また、本セッションでは言及されていませんでしたが、
+TGWを用いたサイト間VPNの接続オプションとして、高可用性・高パフォーマンスな
+Accelerated Site-to-Site VPN が re:Invent2019後から選択可能になりました。
+[速報] AWS Accelerated Site to site VPN Connectionsがリリースされました！ #reinvent
+
+
+サイト間VPN: 仮想プライベートゲートウェイ
+
+仮想プライベートゲートウェイ (Virtual Private Gateway: VGW)
+を使って オンプレミスとVPCを 1対1接続する構成です。
+
+サイト間VPN: ソフトウェアVPN on EC2
+
+EC2インスタンス上に Openswanなどの VPNソフトウェアを起動してオンプレミスと接続する方法です。
+
+ハイブリッドネットワーク アーキテクチャ (Direct Connect)
+ハイブリッドクラウドの構成で使用される Direct Connect(DX)
+の接続方法 3種類を紹介します。
+
+DX: 仮想プライベートゲートウェイ
+
+Private Virtual Interface(VIF) を VPCにアタッチした
+Virtual Private Gateway (VGW) へ接続 する方法です。
+
+DX: Direct Connect Gateway + 仮想プライベートゲートウェイ
+
+Private VIFを Direct Connect Gateway(DX Gateway) へ接続します。
+DX Gateway と 任意リージョンのVPC が接続できます ( 10 VPCまで )
+
+DX: Direct Connect Gateway + Transit Gateway
+
+DX Gateway と TGW を用いる方法です。
+1 DX Gateway につき 3 TGWまで 接続可能です。
+
+ハイブリッドネットワーク アーキテクチャ (IP重複対策)
+オンプレミスとAWSで重複する IPアドレスが存在するときの対策です。
+
+AWS → オンプレミス 向き (PrivateLink + NLB)
+
+PrivateLink + Network Load Balancer で実現します。
+CIDR が 重複しないNAT用 VPC を準備します。
+
+アクセス元VPCに PrivateLink を配置
+NAT用 VPCに Network Load Balancer を配置
+Network Load Balancer の IPターゲット にオンプレミスサーバーのIPアドレス を指定
+
+
+オンプレミス → AWS 向き (PrivateLink + NLB)
+
+同じく PrivateLink + Network Load Balancer で実現します。
+CIDR が 重複しないNAT用 VPC を準備します。
+
+NAT用 VPCに PrivateLink を配置
+アクセス先VPCに Network Load Balancer を配置
+Network Load Balancer の IPターゲット に AWSの EC2やRDSの IPアドレス を指定
+
+
+ハイブリッドネットワーク アーキテクチャ (DNS)
+ハイブリッドネットワークにおける 名前解決(DNS) の実装方法についてです。
+2018年にローンチした Route 53 Resolver が活躍します。
+
+Route 53 Resolver
+
+Route 53 Resolver の以下 3つの構成要素を作成して実現します。
+
+Inbound Endpoint: オンプレミス環境から VPC向けの名前解決を行うためのエンドポイント
+Outbound Endpoint: VPC環境から オンプレミス向けの名前解決を行うためのエンドポイント
+Resolver Rules: フォワーディングのルールを定義
+
+Route 53 Resolver の詳細については 以下 Black Belt などがとても参考になります。
+参照ください。
+
+
+Transit Gateway
+Transit Gateway(TGW) によって ネットワークのハブ接続を可能にします。
+複数のVPC間で通信を行いたい場合も 1 TGW をアタッチするだけで実現できます。
+本章ではセッションで紹介された TGWルートドメインを活用したアーキテクチャ を記載していきいます。
+
+Shared service VPC
+
+共有VPC (Shared services VPC) の役割をもたせるアーキテクチャです。
+
+App1, App2, App3 は 相互にアクセスできない
+App1, App2, App3 は Shared services VPC と オンプレ環境 にアクセスできる
+
+上記 ルールを満たすために、ルートテーブルを 2種類作成しています。
+
+Bump-in-the-wire VPC
+
+通信を 特定のセキュリティアプライアンス経由で流したい、要求を実現するアーキテクチャです。
+
+App1, App2 から発信された通信は TGWを経由して Bump-in-the-wire VPC へ向かいます
+Bump-in-the-wire VPC のメインルートテーブルの デフォルトゲートウェイは セキュリティアプライアンスのENI なので、
+App1, App2 からの通信は セキュリティアプライアンスへ向かうことになります
+セキュリティアプライアンスがあるサブネットのルートテーブル により、
+App1, App2 の所望の通信先へと向かいます
+
+
+その他 (TGW詳細)
+本セッション外ですが、
+Transit Gateway の詳細については以下のセッションや
+Transit Gateway Reference Architecture が参考になります。ぜひ参照ください。
+[レポート] 新サービスの紹介も！複数 VPC における Transit Gateway のリファレンスアーキテクチャ #NET406 #reinvent
+
+
+
+PrivateLink
+
+AWS PrivateLink は AWSでホストされているサービスに、安全にアクセスできる機能です。
+TCP経由 の通信のみサポートしています。
+VPC ピアリングや Transit Gateway と違って、
+PrivateLinkは 特定のポート、特定のIPアドレス のサービスを利用するために、
+VPC間に通信の経路を作成する用途で使用されます。
+ハイブリッドネットワーク アーキテクチャ (IP重複対策) で話したとおり、IP重複の対策として利用できます。
+
+VPCエンドポイントの集中化
+
+PrivateLinkを利用したアーキテクチャとして、 VPCエンドポイントの集中化 が紹介されています。
+
+VPCエンドポイントと
+別名登録のためのRoute 53 プライベートホストゾーン
+
+を前述の Shared Service VPC 構成の 共有VPCに集めて設定します。
+他の VPCと Shared Service VPC間でプライベートホストゾーンを共有 できるようにするために、
+関連付けを行います。
+集中化させることで、エンドポイントの設置台数が減り PrivateLink関連のコストを削減することが出来ます。
+おわりに
+以上、 The right AWS network architecture for the right reason #NET320
+のレポートでした。
+各アーキテクチャの長所・短所やアーキテクチャを決定する際のポイントなど、
+セッションでは言及されています。気になった方はぜひセッションの動画も御覧ください。
+各アーキテクチャを整理・理解することでAWSのネットワークサービスについて広く理解が得られました。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+Ads by Classmethod Ad Network.
+
+
+ 執筆者プロフィール
+
+
+ 川原征大 について詳しくみる 
+
+
+ 
+
+RANK 11
+Exp. 119,515
+
+
+
+
+
+
+    AWS事業本部コンサルティング部所属。
+org-mode教  
+
+
+ 同じシリーズの記事
+
+
+
+
+[レポート] Amazon Neptune を使用した顧客のユースケース #DAT220 #reinvent
+
+
+
+
+				2020年02月13日			
+
+
+ 記事		
+
+ 岩城 匠朗
+
+ 5
+
+ 
+
+[レポート]サーバレスなRide-Sharing Webアプリケーションを構築するハンズオン #SVS203 #reinvent
+
+
+
+
+				2020年02月10日			
+
+
+ 記事		
+
+ Kitano Yuichi
+
+ 5
+
+ 
+85件のシェア(ちょっぴり話題の記事)
+
+[レポート]サーバレスアプリケーションのコツ総ざらえ！(SVS401-R Optimizing your serverless applications) #reinvent
+
+
+
+
+				2020年02月10日			
+
+
+ 記事		
+
+ かずえ
+
+ 85
+
+ 
+
+
+ 開催予定のイベント
+
+
+ もっとみる
+
+
+
+
+
+
+
+
+
+		開催日 
+				2020年02月27日			
+
+ 5
+
+
+
+
+
+
+
+【2/27（木） リモート】クラスメソッドの会社説明会を開催します
+
+
+
+クラスメソッドでは、AWS・AI・ビッグデータ・モバイルなどの技術職や営業のメンバーとして一緒にお仕事をする仲間を大募集しています。
+
+
+
+ 
+
+
+		開催日 
+				2020年03月04日			
+
+ 63
+
+
+
+
+
+
+
+※開催延期【3/4（水）大阪】「認証機能の開発工数削減を実際に体験！次世代認証基盤サービス『Auth0』ハンズオンセミナー」を開催します
+
+
+
+※開催延期【3/4（水）大阪】「認証機能の開発工数削減を実際に体験！次世代認証基盤サービス『Auth0』ハンズオンセミナー」を開催します
+
+
+
+ 
+
+
+		開催日 
+				2020年03月05日			
+
+ 403
+
+
+
+
+403件のシェア(そこそこ話題の記事) 
+
+
+※開催延期【3/5（木）東京】Developers.IO 2020 BigDataを開催します #cmdevio
+
+
+
+新型コロナウイルスの感染拡大を受け、本イベントを延期させていただくことになりました（開催時期未定）。 お申し込みいただいた皆様には大変申し訳ございませんが、何卒ご理解いただけますようよろしくお願いいたします。 状況が収束 […]
+
+
+
+ 
+
+
+		開催日 
+				2020年03月05日			
+
+ 22
+
+
+
+
+
+
+
+【3/5（木） リモート開催】AWSエンジニア MEET UP Vol.2を開催します★リモート開催なので全国からご参加OKです★
+
+
+
+【リモート開催】クラスメソッドのAWSエンジニア MEET UPです。AWSについてライトに色んな情報交換をしましょう。
+
+
+
+ 
+
+
+		開催日 
+				2020年03月06日			
+
+ 5
+
+
+
+
+
+
+
+【3/6（金） 東京】プロジェクトマネージャー採用 MEET UPを開催します！
+
+
+
+3月6日にプロジェクトマネージャー採用MEET UPを開催いたします！クラスメソッドの「自社サービスでECプラットフォームをドライブしていくPM」ポジションについてお話しいたします！
+
+
+
+ 
+
+
+
+
+ 週間ランキング
+
+
+ もっとみる
+
+
+
+
+
+
+
+
+216件のシェア(すこし話題の記事)
+
+MacのTerminalでsudo実行時にタッチIDを使用する方法
+
+
+
+ 記事		
+
+
+				2020年02月22日			
+
+
+ 夏目祐樹
+
+ 216
+
+
+
+こんにちは、CX事業本部の夏目です。 MacのタッチバーのタッチIDが非常に便利なのですが、Terminalでsudoを叩かないと行けないときに使えたらなぁと思ったので、情報を共有します。 使う方法 /etc/pam.d […]
+
+ツール
+その他 
+
+
+
+212件のシェア(すこし話題の記事)
+Developers.IO CAFEだより シリーズ
+
+Developers.IO CAFEがオープンして一周年を迎えました
+
+
+
+ 記事		
+
+
+				2020年02月17日			
+
+
+ オカノ
+
+ 212
+
+
+
+カフェがオープンして１年が経ちました！ こんにちは。カフェ店長のオカノです。 2019年2月12日にオープンしたDevelopers.IO CAFEは、先日オープン一周年を迎えました！ この一年の間、カフェは日に日にバー […]
+
+その他 
+
+
+
+201件のシェア(すこし話題の記事)
+リモートワーク(テレワーク・在宅勤務) シリーズ
+
+やっぱり難易度の高い在宅勤務をちょっとでもうまくやるために心がけていること
+
+
+
+ 記事		
+
+
+				2020年02月20日			
+
+
+ kwappa
+
+ 201
+
+
+
+事業開発部の塩谷 (@kwappa) です。今日はオフィスに用があるので、通勤ラッシュを避けて出社しました。 この子は新メンバーのさめくんです。在宅勤務が推奨されているのでオフィスが閑散としており、すこしさみしそうです。 […]
+
+リモートワーク 
+
+
+
+109件のシェア(ちょっぴり話題の記事)
+
+社内で「登壇勉強会」が開催されたので、「登壇は最強の生存戦略である」という登壇をしました
+
+
+
+ 記事		
+
+
+				2020年02月22日			
+
+
+ kwappa
+
+ 109
+
+
+
+事業開発部の塩谷 (@kwappa) です。 タイトルがすべてなのですが、社内で「登壇勉強会」が開催されたので、「登壇は最強の生存戦略である」というタイトルで登壇しました。 といってもコロナウイルスの感染拡大対策が強化さ […]
+
+勉強会 
+
+
+
+94件のシェア(ちょっぴり話題の記事)
+
+【読書感想文】ドメイン駆動設計入門 ボトムアップでわかる! ドメイン駆動設計の基本
+
+
+
+ 記事		
+
+
+				2020年02月19日			
+
+
+ 稲葉純
+
+ 94
+
+
+
+ドメイン駆動設計には興味を持ちつつエリック・エヴァンスのドメイン駆動設計は数年前に積んだまま、という状態で何年か立ってしまったのですが、新しくDDD の本が出ていたので読んでみたところよかったので紹介させていただきます。 […]
+
+書評 
+
+
+
+
+
+ 月間ランキング
+
+
+ もっとみる
+
+
+
+
+
+
+
+
+391件のシェア(そこそこ話題の記事)
+
+AWS アップデート職人になるための Tips
+
+
+
+ 記事		
+
+
+				2020年02月12日			
+
+
+ 丸毛篤史
+
+ 391
+
+
+
+AWS アップデート職人になるための Tips です。（ポエムを添えて）
+
+AWS 
+
+
+
+295件のシェア(すこし話題の記事)
+
+IFTTTやZapierのようなワークフロー自動化OSSのn8nをECS on Fargate上に建ててみた
+
+ OSS・サービスDockerECS
+
+
+ 記事		
+
+
+				2020年02月05日			
+
+
+ 臼田佳祐
+
+ 295
+
+
+
+ワークフロー自動化OSSのn8nをAWS環境で建てて検証してみました。非常に期待できるサービスです。ついでにECS on Fargateの勉強をしています。使ってみたい方は参考にしてください。
+
+AWS 
+
+
+
+255件のシェア(すこし話題の記事)
+
+[速報]ついにSnowflake日本上陸！AWS東京リージョンでSnowflakeを動かす！ #SnowflakeDB
+
+ Snowflake『カスタマーストーリー』を支えるツール特集
+
+
+ 記事		
+
+
+				2020年02月04日			
+
+
+ 甲木 洋介
+
+ 255
+
+
+
+SnowflakeがAWSの東京リージョン上で稼働するようになりました。データを日本に置けます。
+
+ビジネス・アナリティクス 
+
+
+
+233件のシェア(すこし話題の記事)
+
+[レポート]「ねこ x Tech」なイベントAWS Nyantechへ参加してきました #AWSNyantech
+
+
+
+ 記事		
+
+
+				2020年02月06日			
+
+
+ 芳賀健
+
+ 233
+
+
+
+こんにちは！猫様の忠実なるしもべ、芳賀健です。 猫様への愛が溢れる人たちが集まるイベント「AWS Nyantech（にゃんてっく）」がAWS Loft Tokyoで開催されました。 会場には、Special Guestと […]
+
+その他 
+
+
+
+216件のシェア(すこし話題の記事)
+
+MacのTerminalでsudo実行時にタッチIDを使用する方法
+
+
+
+ 記事		
+
+
+				2020年02月22日			
+
+
+ 夏目祐樹
+
+ 216
+
+
+
+こんにちは、CX事業本部の夏目です。 MacのタッチバーのタッチIDが非常に便利なのですが、Terminalでsudoを叩かないと行けないときに使えたらなぁと思ったので、情報を共有します。 使う方法 /etc/pam.d […]
+
+ツール
+その他 
+
+
+
+
+
+
+
+
+
+
+
+
+Amazon Web Services
+
+AWS特集
+EC2
+S3
+RDS
+Lambda
+VPC
+IAM
+
+
+ビッグデータ
+
+Redshift
+Tableau
+Alteryx
+
+
+ランキング
+
+Amazon Alexa
+モバイル
+サーバーレス
+セキュリティ
+四半期ランキング
+RSS
+
+
+お問い合わせ
+
+AWSに関するご相談
+セミナーお知らせメール
+会社説明会
+
+
+運営会社について
+
+クラスメソッド株式会社
+会社概要
+アクセス
+プライバシーポリシー
+クッキーポリシー
+
+
+ 
+
+
+produced by
+
+
+
+
+
+© Classmethod, Inc. All rights reserved.
+
+
+
+
+
+
+
+
+資料
+目次
+フラットネットワーク アーキテクチャ (Single VPC)
+分割ネットワーク アーキテクチャ (Multi VPC)
+ハイブリッドネットワーク アーキテクチャ (サイト間VPN)
+ハイブリッドネットワーク アーキテクチャ (Direct Connect)
+ハイブリッドネットワーク アーキテクチャ (IP重複対策)
+ハイブリッドネットワーク アーキテクチャ (DNS)
+Transit Gateway
+PrivateLink
+おわりに 
+
+
+
+
+
+
+
+ カテゴリー
+
+
+
+
+
+ カテゴリー一覧
+ 営業事務
+
+その他
+
+プロジェクトマネジメント
+
+RIA
+
+IA
+
+クライアントサイド
+
+サーバーサイド
+
+クラウド
+
+ソーシャル
+
+見積もり
+
+ビジュアルデザイン
+
+ツール
+
+セキュリティ
+
+ソリューション
+
+アーキテクチャ
+
+勉強会
+
+Docker
+
+Alteryx
+
+マーケティング
+
+スマートフォン
+
+iPhone
+
+Android
+
+Windows Phone
+
+Facebook
+
+Twitter
+
+AWS
+
+Azure
+
+Flex
+
+HTML5
+
+AIR
+
+言語
+
+OS
+
+サーバー
+
+ネットワーク
+
+言語
+
+ブラウザ
+
+データベース
+
+Ajax
+
+Photoshop
+
+ユーザビリティ
+
+インタラクション
+
+フレームワーク
+
+Node.js
+
+Java
+
+ハードウェア
+
+Raspberry Pi
+
+jQuery
+
+Chef
+
+Ruby on Rails
+
+Arduino
+
+ビジネス
+
+ビジネスモデル・ジェネレーション
+
+ビジネス・アナリティクス
+
+読書会
+
+設計
+
+Twilio
+
+Wordpress
+
+LEAP Motion
+
+テスティング
+
+ユニットテスト
+
+リモートワーク
+
+Groovy
+
+Gradle
+
+Ember.js
+
+JavaScript
+
+Office
+
+Jenkins
+
+CI
+
+Eclipse
+
+Thymeleaf
+
+開発環境
+
+ビッグデータ
+
+会社説明会
+
+Angular.js
+
+Docker
+
+Cocos2d-x
+
+イベント
+
+OTRS
+
+GCP
+
+Amazon WorkSpaces
+
+プログラミング不要
+
+初心者向け
+
+書評
+
+sketch3
+
+Unity
+
+Ansible
+
+Talend
+
+TreasureData
+
+Android Studio
+
+ベンチマーク
+
+Apple Watch
+
+デザイン
+
+Edison
+
+機械学習
+
+Hadoop
+
+Git
+
+Go
+
+オペレーション
+
+性能テスト
+
+Google+
+
+PR
+
+Tableau
+
+concrete5
+
+UnrealEngine
+
+SORACOM
+
+Elixir
+
+統計
+
+Scala
+
+Elasticsearch
+
+ユーザー事例
+
+English Blog
+
+SendBird
+
+AppleScript
+
+アジャイル
+
+DevOps
+
+Node.js
+
+ブログ
+
+オムニチャネル
+
+Python
+
+InstaVR
+
+チーム開発
+
+GitHub
+
+サーバーレス
+
+音声アシスタント
+
+Amazon Alexa
+
+レポート
+
+Swagger
+
+SPA
+
+R&D
+
+Actions on Google
+
+Auth0
+
+Vue
+
+G Suite
+
+Algolia
+
+Developers.IO Cafe
+
+マネジメント
+
+Gatebox
+
+
+
+
+
+ RSS
+
+
+
+
+
+
+全体
+AWS
+モバイル
+ビッグデータ
+サーバーサイド
+
+
+
+
+ シェア
+
+
+
+
+
+
+Developers.IO はクラスメソッド株式会社が運営するAWS・iOS・HTML5に関する技術情報サイトです。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=148802088508667";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-50113-7', 'auto');
+    ga('require', 'GTM-K8ZG787');
+    ga('require', 'displayfeatures');
+        ga('send', 'pageview', {
+      'dimension1': 'natsume-yuta'
+    });
+    
+  
+
+/* <![CDATA[ */
+var countVars = {"disqusShortname":"dev-classmethod-blog"};
+/* ]]> */
+
+
+
+/* <![CDATA[ */
+var embedVars = {"disqusConfig":{"integration":"wordpress 3.0.15"},"disqusIdentifier":"518261 https:\/\/dev.classmethod.jp\/?p=518261","disqusShortname":"dev-classmethod-blog","disqusTitle":"[\u30ec\u30dd\u30fc\u30c8] AWS \u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u30a2\u30fc\u30ad\u30c6\u30af\u30c1\u30e3 \u7dcf\u307e\u3068\u3081\uff01 #NET320 #reinvent","disqusUrl":"https:\/\/dev.classmethod.jp\/cloud\/aws\/aws-nw-architectures-net320\/","postId":"518261"};
+/* ]]> */
+
+
+
+window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"b892d0f53f","applicationID":"484678717","transactionName":"Yl0AbBQAX0AAW0cPXFsXI1sSCF5dTktaCFRZXQ==","queueTime":0,"applicationTime":668,"atts":"ThoDGlwaTE4=","errorBeacon":"bam.nr-data.net","agent":""}
