@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # ライブラリ インポート
@@ -9,18 +9,20 @@ import boto3
 import pandas as pd
 
 
-# In[ ]:
+# In[2]:
 
 
 # boto3 client
 client = boto3.client('ec2')
 
 
-# In[ ]:
+# In[3]:
 
 
 # 名前タグ取得用関数
 def get_name_from_tags(tags):
+    if tags == None:
+        return ""
     tags_filter = [t['Value'] for t in tags if t['Key'] == "Name"]
     if tags_filter:
         return tags_filter[0]
@@ -28,26 +30,26 @@ def get_name_from_tags(tags):
         return ""
 
 
-# In[ ]:
+# In[4]:
 
 
 # VPC　ID <--> VPC Name 対応関係の情報取得
 vpcs = client.describe_vpcs()['Vpcs']
 
 
-# In[ ]:
+# In[5]:
 
 
 df_vpcs = pd.DataFrame(
     [
-        [vpc['VpcId'], get_name_from_tags(vpc['Tags'])]
+        [vpc['VpcId'], get_name_from_tags(vpc.get('Tags'))]
         for vpc in vpcs
     ],
     columns=['VpcId', 'Name']
 )
 
 
-# In[ ]:
+# In[6]:
 
 
 # VPC Name 取得用関数
@@ -59,7 +61,7 @@ def get_vpc_name(vpcid):
         return df_filter.iloc[0]['Name']
 
 
-# In[ ]:
+# In[7]:
 
 
 # Security Groups 情報取得
@@ -68,10 +70,10 @@ sgs = client.describe_security_groups()['SecurityGroups']
 
 # ## Security Groups 一覧
 
-# In[ ]:
+# In[15]:
 
 
-sgs.sort(key=lambda sg:sg['VpcId'])
+sgs.sort(key=lambda sg:sg['GroupName'])
 df_sgs = pd.DataFrame(
     [
         [
@@ -87,7 +89,7 @@ df_sgs = pd.DataFrame(
 df_sgs.index = df_sgs.index + 1
 
 
-# In[ ]:
+# In[16]:
 
 
 # display
@@ -96,9 +98,17 @@ print(df_sgs.to_markdown())
 print('')
 
 
+# ## SecurityGroups 一覧
+
+# In[17]:
+
+
+df_sgs
+
+
 # ## 各 Security Group Rules
 
-# In[ ]:
+# In[18]:
 
 
 # Security Group の名前取得用
@@ -110,7 +120,7 @@ def get_sg_name(sgid):
         return df_filter.iloc[0]['GroupName']
 
 
-# In[ ]:
+# In[19]:
 
 
 # Ip Protocol 表示用
@@ -121,7 +131,7 @@ def parse_ip_protocol(ip_protocol):
         return ip_protocol
 
 
-# In[ ]:
+# In[20]:
 
 
 # Port Range 表示用
@@ -141,7 +151,7 @@ def parse_port_range(ip_protocol, from_port, to_port):
         return "Type:{} Code:{}".format(icmp_type, icmp_code)
 
 
-# In[ ]:
+# In[21]:
 
 
 print('## 各 SecurityGroup ルール')
@@ -190,4 +200,10 @@ for sg in sgs:
     else:
         print(df_rules.to_markdown())
     print('')
+
+
+# In[ ]:
+
+
+
 
