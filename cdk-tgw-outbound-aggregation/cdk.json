@@ -1,0 +1,13 @@
+{
+  "app": "python3 app.py",
+  "context": {
+    "prj": "TgwArch",
+    "cidr-app-vpc": "10.1.0.0/16",
+    "cidr-app-ec2-subnet": "10.1.0.0/24",
+    "cidr-app-tgw-subnet": "10.1.254.0/28",
+    "cidr-out-vpc": "10.254.0.0/16",
+    "cidr-out-ngw-subnet": "10.254.0.0/24",
+    "cidr-out-tgw-subnet": "10.254.254.0/28",
+    "ami-id": "ami-052652af12b58691f"
+  }
+}
