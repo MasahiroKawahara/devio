@@ -1,0 +1,11 @@
+{
+  "app": "python3 app.py",
+  "context": {
+    "prj": "MultiAccountTgw",
+    "out-vpc-cidr": "10.254.0.0/16",
+    "out-ngw-subnet-cidr": "10.254.0.0/24",
+    "out-tgw-subnet-cidr": "10.254.254.0/28",
+    "child-vpc-cidr": "10.1.0.0/16",
+    "child-tgw-attachment-id": "tgw-attach-07ca923b9cdaab478"
+  }
+}

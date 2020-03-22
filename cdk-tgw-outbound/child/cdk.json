@@ -1,0 +1,11 @@
+{
+  "app": "python3 app.py",
+  "context": {
+    "prj": "MultiAccountTgwChild",
+    "cidr-app-vpc": "10.1.0.0/16",
+    "cidr-app-ec2-subnet": "10.1.0.0/24",
+    "cidr-app-tgw-subnet": "10.1.254.0/28",
+    "ami-id": "ami-052652af12b58691f",
+    "tgw-id": "tgw-005c5036a1d9703a1"
+  }
+}
